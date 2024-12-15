@@ -41,6 +41,29 @@ class RSA:
             n |= (1 << bits - 1) | 1
             if self.is_prime(n):
                 return n
+            
+    def generate_prime_e(self, phi):
+        """
+        Generate a suitable public exponent e that is:
+        1. Coprime with phi
+        2. 1 < e < phi
+        3. Typically a prime number for better security
+        """
+        while True:
+            # Generate a random odd number in a reasonable range
+            e = random.getrandbits(32) | (1 << 16) | 1
+            
+            # Must be less than phi and greater than 1
+            if e >= phi:
+                continue
+                
+            # Check if it's probably prime using existing is_prime
+            if not self.is_prime(e, k=5):
+                continue
+                
+            # Check if it's coprime with phi
+            if math.gcd(e, phi) == 1:
+                return e
                 
     def extended_gcd(self, a, b):
         if a == 0:
@@ -57,18 +80,36 @@ class RSA:
         return x % phi
         
     def generate_keys(self):
+        """
+        Generate public and private key pairs with dynamic public exponent e
+        """
         bits = self.key_size // 2
+        
+        # Generate two distinct prime numbers using existing generate_prime
         p = self.generate_prime(bits)
         q = self.generate_prime(bits)
+        while p == q:  # Ensure p and q are different
+            q = self.generate_prime(bits)
         
         n = p * q
         phi = (p - 1) * (q - 1)
         
-        e = 65537
+        # Generate public exponent e dynamically
+        e = self.generate_prime_e(phi)
+        
+        # Calculate private exponent d
         d = self.mod_inverse(e, phi)
         
         self.public_key = (e, n)
         self.private_key = (d, n)
+        
+        # Validation check
+        test_message = random.getrandbits(64)
+        encrypted = pow(test_message, e, n)
+        decrypted = pow(encrypted, d, n)
+        if test_message != decrypted:
+            # If validation fails, regenerate keys
+            return self.generate_keys()
 
     def sign(self, message):
         """

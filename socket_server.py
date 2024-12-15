@@ -18,9 +18,8 @@ class PKAServer:
         print("\n[PKA SERVER KEY GENERATION]")
         print("Generated RSA key pair for PKA Server:")
         print(f"Public Key (e): {self.rsa.public_key[0]}")
-        print(f"Public Key (n): {self.rsa.public_key[1]}")
         print(f"Private Key (d): {self.rsa.private_key[0]}")
-        print(f"Private Key (n): {self.rsa.private_key[1]}")
+        print(f"n: {self.rsa.public_key[1]}")  # Print n only once
         print("\nPKA Server is ready to sign client public keys")
         
     def start(self):

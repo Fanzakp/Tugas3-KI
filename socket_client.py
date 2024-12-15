@@ -48,9 +48,8 @@ class P2PClient:
         print(f"\n[CLIENT {self.client_id} KEY GENERATION]")
         print("Generated RSA key pair for client:")
         print(f"Public Key (e): {self.rsa.public_key[0]}")
-        print(f"Public Key (n): {self.rsa.public_key[1]}")
         print(f"Private Key (d): {self.rsa.private_key[0]}")
-        print(f"Private Key (n): {self.rsa.private_key[1]}")
+        print(f"n: {self.rsa.public_key[1]}")  # Print n only once
         
         self.start_peer_server()
         
